@@ -1,0 +1,60 @@
+{
+    "Resources":{
+        "S3AxelRodriguezWebSiteBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "AccessControl": "PublicRead",
+                "BucketName": "axel-rodriguez.com",
+                "WebsiteConfiguration": {
+                    "ErrorDocument": "error.html",
+                    "IndexDocument": "index.html"
+                }
+
+            }
+        },
+        "S3AxelRodriguezWebSiteBucketSub": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "AccessControl": "BucketOwnerFullControl",
+                "BucketName": "www.axel-rodriguez.com",
+                "WebsiteConfiguration": {
+                    "RedirectAllRequestsTo": {
+                        "HostName": "axel-rodriguez.com"
+                    }
+                }
+            }
+        },
+        "AxelRodriguezHostedZone": {
+            "Type" : "AWS::Route53::HostedZone",
+            "Properties": {
+                "Name": "axel-rodriguez.com"
+            }
+        },
+        "AxelRodriguezRecordSetGroup": {
+            "Type": "AWS::Route53::RecordSetGroup",
+            "Properties": {
+                "HostedZoneName": "axel-rodriguez.com.",
+                "RecordSets": [
+                    {
+                        "Name": "axel-rodriguez.com",
+                        "Type": "A",
+                        "AliasTarget": {
+                            "HostedZoneId": "Z2O1EMRO9K5GLX",
+                            "DNSName" : "axel-rodriguez.com.s3-website.us-east-2.amazonaws.com"
+                        }
+                    },
+                    {
+                        "Name": "www.axel-rodriguez.com",
+                        "Type": "CNAME",
+                        "TTL" : "900",
+                        "ResourceRecords": [
+                            { 
+                                "Fn::GetAtt" : ["S3AxelRodriguezWebSiteBucketSub", "DomainName"] 
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+}
