@@ -40,7 +40,7 @@
                         "Type": "A",
                         "AliasTarget": {
                             "HostedZoneId": "Z2O1EMRO9K5GLX",
-                            "DNSName" : "axel-rodriguez.com.s3-website.us-east-2.amazonaws.com"
+                            "DNSName" : "s3-website.us-east-2.amazonaws.com"
                         }
                     },
                     {
