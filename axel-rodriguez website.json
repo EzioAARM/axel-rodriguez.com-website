@@ -1,4 +1,12 @@
 {
+    "Mappings" : {
+        "HostedZoneMap": {
+            "us-east-2" : {
+                "hostedZone" : "Z2O1EMRO9K5GLX",
+                "endPointS3" : "s3-website.us-east-2.amazonaws.com"
+            }
+        }
+    },
     "Resources":{
         "S3AxelRodriguezWebSiteBucket": {
             "Type": "AWS::S3::Bucket",
@@ -19,41 +27,45 @@
                 "BucketName": "www.axel-rodriguez.com",
                 "WebsiteConfiguration": {
                     "RedirectAllRequestsTo": {
-                        "HostName": "axel-rodriguez.com"
+                        "HostName": {
+                            "Ref": "S3AxelRodriguezWebSiteBucket"
+                        }
                     }
                 }
             }
         },
-        "AxelRodriguezHostedZone": {
-            "Type" : "AWS::Route53::HostedZone",
+        "BucketPolicy": {
+            "Type": "AWS::S3::BucketPolicy",
             "Properties": {
-                "Name": "axel-rodriguez.com"
-            }
-        },
-        "AxelRodriguezRecordSetGroup": {
-            "Type": "AWS::Route53::RecordSetGroup",
-            "Properties": {
-                "HostedZoneName": "axel-rodriguez.com.",
-                "RecordSets": [
-                    {
-                        "Name": "axel-rodriguez.com",
-                        "Type": "A",
-                        "AliasTarget": {
-                            "HostedZoneId": "Z2O1EMRO9K5GLX",
-                            "DNSName" : "s3-website.us-east-2.amazonaws.com"
-                        }
-                    },
-                    {
-                        "Name": "www.axel-rodriguez.com",
-                        "Type": "CNAME",
-                        "TTL" : "900",
-                        "ResourceRecords": [
-                            { 
-                                "Fn::GetAtt" : ["S3AxelRodriguezWebSiteBucketSub", "DomainName"] 
+                "PolicyDocument": {
+                    "Id": "axel-rodriguez-bucket-polcy",
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Sid": "PublicReadForGetBucketObjects",
+                            "Effect": "Allow",
+                            "Principal": "*",
+                            "Action": [
+                                "s3:GetObject"
+                            ],
+                            "Resource": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "arn:aws:s3:::",
+                                        {
+                                            "Ref": "S3AxelRodriguezWebSiteBucket"
+                                        },
+                                        "/*"
+                                    ]
+                                ]
                             }
-                        ]
-                    }
-                ]
+                        }
+                    ]
+                },
+                "Bucket": {
+                    "Ref": "S3AxelRodriguezWebSiteBucket"
+                }
             }
         }
     }
