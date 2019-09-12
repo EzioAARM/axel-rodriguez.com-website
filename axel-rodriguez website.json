@@ -67,6 +67,46 @@
                     "Ref": "S3AxelRodriguezWebSiteBucket"
                 }
             }
+        },
+        "AxelRodriguezRecordSetGroup": {
+            "Type": "AWS::Route53::RecordSetGroup",
+            "Properties": {
+                "HostedZoneName": "axel-rodriguez.com.",
+                "RecordSets": [
+                    {
+                        "Name": "axel-rodriguez.com",
+                        "Type": "A",
+                        "AliasTarget": {
+                            "HostedZoneId": {
+                                "Fn::FindInMap" : [
+                                    "HostedZoneMap", {
+                                        "Ref" : "AWS::Region"
+                                    }, "hostedZone"
+
+                                ]
+                            },
+                            "DNSName" : {
+                                "Fn::FindInMap" : [
+                                    "HostedZoneMap", {
+                                        "Ref" : "AWS::Region"
+                                    }, "endPointS3"
+
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "Name": "www.axel-rodriguez.com",
+                        "Type": "CNAME",
+                        "TTL" : "900",
+                        "ResourceRecords": [
+                            { 
+                                "Fn::GetAtt" : ["S3AxelRodriguezWebSiteBucketSub", "DomainName"] 
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     }
 }
